@@ -1,7 +1,5 @@
 from langchain.schema import HumanMessage, SystemMessage, AIMessage
 
-from text_to_speech import text_to_speech
-
 class BasePrompter:
     def __init__(self, model):
         self.model = model

@@ -1,6 +1,5 @@
 from prompts.base import BasePrompter
-from text_to_speech import text_to_speech
-
+from utils.text_to_speech import text_to_speech
 
 class ConversationPrompter(BasePrompter):
     def __init__(self, model, config):

@@ -1,7 +1,10 @@
+from prompts.math import MathPrompter
 from prompts.convesation import ConversationPrompter
+from prompts.tesnses import TensesPrompter
 from prompts.tv_convesation import TvConvesationPrompter
+from prompts.vocabulary import VocabularyPrompter
 
-prompters = [ConversationPrompter, TvConvesationPrompter]
+prompters = [ConversationPrompter, TvConvesationPrompter, MathPrompter, VocabularyPrompter, TensesPrompter]
 
 def get_all_configs():
     configs = {}

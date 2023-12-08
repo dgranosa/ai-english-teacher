@@ -1,12 +1,13 @@
+import time
 from langchain.chat_models import ChatOpenAI
-
-import streamlit as st
-
-# Parse .env file
 from dotenv import dotenv_values
+import streamlit as st
+import base64
 
+from prompts.base import BasePrompter
 from prompts.index import get_all_configs, get_prompter
 
+# Parse .env file
 config = dotenv_values(".env")
 OPENAI_API_KEY = config['OPENAI_API_KEY']
 
@@ -21,6 +22,31 @@ def reset():
 
     first_message = {'message': st.session_state.prompter.first_message(), 'is_user': False}
     st.session_state.chat_history = [first_message]
+
+def autoplay_audio(audio):
+    b64 = base64.b64encode(audio).decode()
+    md = f"""
+        <audio controls autoplay="true" style="width: 100%">
+            <source src="data:audio/mp3;base64,{b64}" type="audio/mp3">
+        </audio>
+        """
+    st.session_state.autoplay_audio_ref = st.markdown(
+        md,
+        unsafe_allow_html=True,
+    )
+
+def render_message(message, is_last=False):
+    with st.chat_message("user" if message['is_user'] else "assistant"):
+        st.write(message['message'])
+
+        if 'audio' in message:
+            if is_last:
+                autoplay_audio(message['audio'])
+            else:
+                st.audio(message['audio'], format='mp3')
+
+        if 'image' in message:
+            st.image(message['image'])
 
 def main():
     st.title('English Learning Chatbot')
@@ -49,23 +75,32 @@ def main():
                 'temperature': temperature
             }
             reset()
+            
+    # Display chat messages
+    for message in st.session_state.chat_history:
+        render_message(message)
 
     # Chat area
     user_message = st.chat_input("Type your message here:")
     if user_message:
+        # Delete autoplay audio component
+        if 'autoplay_audio_ref' in st.session_state:
+            st.session_state.autoplay_audio_ref.empty()
+
         st.session_state.chat_history.append({'message': user_message, 'is_user': True})
+        render_message(st.session_state.chat_history[-1])
+        
+        if user_message == 'sleep':
+            time.sleep(60)
 
         # Run model
-        prompter = st.session_state.prompter
-        response_message = prompter(st.session_state.chat_history)
-        st.session_state.chat_history.append(response_message)
+        with st.spinner('Thinking...'):
+            prompter: BasePrompter = st.session_state.prompter
+            response_message = prompter(st.session_state.chat_history)
+            st.session_state.chat_history.append(response_message)
+        render_message(st.session_state.chat_history[-1], is_last=True)
 
-    # Display chat messages
-    for chat in st.session_state.chat_history:
-        with st.chat_message("user" if chat['is_user'] else "assistant"):
-            st.write(chat['message'])
-            if 'audio' in chat:
-                st.audio(chat['audio'], format='mp3')
+        
 
 if __name__ == '__main__':
     main()
