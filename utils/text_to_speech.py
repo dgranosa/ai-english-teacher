@@ -1,9 +1,7 @@
+import os
 from openai import OpenAI
-from dotenv import dotenv_values
 
-config = dotenv_values(".env")
-
-client = OpenAI(api_key=config['OPENAI_API_KEY'])
+client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
 def text_to_speech(text):
   response = client.audio.speech.create(

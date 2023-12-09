@@ -1,15 +1,16 @@
+import os
 import time
-from langchain.chat_models import ChatOpenAI
-from dotenv import dotenv_values
-import streamlit as st
 import base64
+import streamlit as st
+from dotenv import load_dotenv
+from langchain.chat_models import ChatOpenAI
 
 from prompts.base import BasePrompter
 from prompts.index import get_all_configs, get_prompter
 
 # Parse .env file
-config = dotenv_values(".env")
-OPENAI_API_KEY = config['OPENAI_API_KEY']
+load_dotenv()
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
 configs = get_all_configs()
 

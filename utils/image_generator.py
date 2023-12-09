@@ -1,9 +1,7 @@
+import os
 from openai import OpenAI
-from dotenv import dotenv_values
 
-config = dotenv_values(".env")
-
-client = OpenAI(api_key=config['OPENAI_API_KEY'])
+client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
 def generate_image(prompt, size="1024x1024", quality="standard", n=1):
   response = client.images.generate(
