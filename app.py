@@ -16,6 +16,10 @@ configs = get_all_configs()
 
 # Setup model
 def reset():
+    if 'autoplay_audio_ref' in st.session_state:
+        st.session_state.autoplay_audio_ref.empty()
+        del st.session_state.autoplay_audio_ref
+
     st.session_state.model = ChatOpenAI(streaming=True, model=st.session_state.config['model'], temperature=st.session_state.config['temperature'], openai_api_key=OPENAI_API_KEY)
 
     Prompter = get_prompter(st.session_state.config['topic'], st.session_state.config['subtopic'])
@@ -62,7 +66,7 @@ def main():
         st.markdown('---')
 
         with st.expander("Developer Config", expanded=False):
-            model = st.selectbox('Select ChatGPT Model', ['gpt-4-1106-preview', 'gpt-3.5-turbo-1106', 'gpt-4', 'gpt-3.5-turbo'])
+            model = st.selectbox('Select ChatGPT Model', ['gpt-4-1106-preview', 'gpt-3.5-turbo-1106', 'gpt-4'])
             temperature = st.slider('Select Temperature', min_value=0.0, max_value=2.0, value=1.0)
 
             st.button('Reset Chat History', on_click=reset)
@@ -88,11 +92,9 @@ def main():
         if 'autoplay_audio_ref' in st.session_state:
             st.session_state.autoplay_audio_ref.empty()
 
-        st.session_state.chat_history.append({'message': user_message, 'is_user': True})
-        render_message(st.session_state.chat_history[-1])
-        
-        if user_message == 'sleep':
-            time.sleep(60)
+        message = {'message': user_message, 'is_user': True}
+        st.session_state.chat_history.append(message)
+        render_message(message)
 
         # Run model
         with st.spinner('Thinking...'):
