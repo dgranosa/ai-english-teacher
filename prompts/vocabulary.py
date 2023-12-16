@@ -31,4 +31,5 @@ class VocabularyPrompter(BasePrompter):
     def generate_base_prompt(self):
         return f"""
 Generate a english vocabulary quiz.
+If student answers correctly multiple times, you can give them a harder questions. If student answers incorrectly multiple times, you can give them an easier question.
 """
